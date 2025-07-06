@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Session, select
-from .engine import engine
+from .engine import test_engine
 from models.clients_model import Clients
 from models.commandes_model import Commandes
 from models.produits_model import Produits
@@ -8,7 +8,7 @@ from .database import create_db_and_tables
 from datetime import datetime
 
 def insert_test_data():
-    with Session(engine) as session:
+    with Session(test_engine) as session:
         if not session.exec(select(Clients)).first():
             clients = [
                 Clients(nom="Alice", email="alice@example.com"),

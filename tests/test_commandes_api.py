@@ -1,4 +1,13 @@
 import pytest
+from database import session
+from sqlmodel import SQLModel
+from database.engine import test_engine
+from models.commandes_model import Commandes
+
+@pytest.fixture(scope="session", autouse=True)
+def create_tables():
+    SQLModel.metadata.create_all(test_engine)
+    yield
 
 def test_api_create_and_get_commande(client):
     new_commande = {
