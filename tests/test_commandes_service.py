@@ -4,6 +4,9 @@ from models.commandes_model import Commandes
 from services import commandes_service
 from sqlmodel import Session, text
 from database.engine import test_engine
+from fastapi import HTTPException
+from unittest.mock import patch
+from routes.commandes import create_commande
 
 @pytest.fixture(autouse=True)
 def clean_commandes_table():
@@ -49,3 +52,23 @@ def test_tables_exist(session):
         text("SELECT name FROM sqlite_master WHERE type='table' AND name='commandes'")
     )
     assert result.first() is not None
+
+def test_create_commande_exception_handling():
+    commande = Commandes(id=999, client_id=1, quantite_total=1, montant_total=100.0)
+
+    with patch('services.commandes_service.create_commande', side_effect=Exception("Erreur test")):
+        with Session(test_engine) as session:
+            with pytest.raises(HTTPException) as exc_info:
+                create_commande(commande, session)
+
+            assert exc_info.value.status_code == 400
+            assert "Erreur lors de la création" in exc_info.value.detail
+
+
+from database.session import get_session
+
+def test_get_session_function():
+    sessions = list(get_session())
+    assert len(sessions) == 1
+    session = sessions[0]
+    assert session is not None

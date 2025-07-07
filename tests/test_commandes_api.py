@@ -1,8 +1,10 @@
 import pytest
 from database import session
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel,Session
 from database.engine import test_engine
 from models.commandes_model import Commandes
+from fastapi.testclient import TestClient
+from main import app
 
 @pytest.fixture(scope="session", autouse=True)
 def create_tables():
@@ -103,3 +105,27 @@ def test_delete_then_delete_again(client):
 def test_get_commande_invalid_id_type(client):
     response = client.get("/commandes/bad_id")
     assert response.status_code == 422
+
+def test_create_commande_duplicate_error_handling(client):
+    data = {
+        "id": 9999,
+        "client_id": 1,
+        "quantite_total": 1,
+        "montant_total": 50.0
+    }
+
+    # Création initiale : OK
+    response = client.post("/commandes/", json=data)
+    assert response.status_code == 201
+
+    # Création avec le même ID => doit déclencher l'erreur avec le print et HTTPException
+    response = client.post("/commandes/", json=data)
+    assert response.status_code == 400
+    assert "Commande déjà existante" in response.json()["detail"]
+
+client = TestClient(app)
+
+def test_get_commandes_endpoint():
+    response = client.get("/commandes/")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)

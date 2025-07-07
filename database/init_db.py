@@ -5,7 +5,8 @@ from models.commandes_model import Commandes
 from models.produits_model import Produits
 from models.lignes_commandes_model import LignesCommandes
 from .database import create_db_and_tables
-from datetime import datetime
+from datetime import datetime, timezone
+
 
 def insert_test_data():
     with Session(test_engine) as session:
@@ -33,9 +34,9 @@ def insert_test_data():
 
         if not session.exec(select(LignesCommandes)).first():
             lignes = [
-                LignesCommandes(id_commande=1, id_produit=1, quantite=1, prix_total=999.99, date=datetime.utcnow()),
-                LignesCommandes(id_commande=1, id_produit=2, quantite=1, prix_total=29.99, date=datetime.utcnow()),
-                LignesCommandes(id_commande=1, id_produit=3, quantite=1, prix_total=89.99, date=datetime.utcnow()),
+                LignesCommandes(id_commande=1, id_produit=1, quantite=1, prix_total=999.99, date=datetime.now(timezone.utc)),
+                LignesCommandes(id_commande=1, id_produit=2, quantite=1, prix_total=29.99, date=datetime.now(timezone.utc)),
+                LignesCommandes(id_commande=1, id_produit=3, quantite=1, prix_total=89.99, date=datetime.now(timezone.utc)),
             ]
             session.add_all(lignes)
             session.commit()

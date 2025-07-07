@@ -5,6 +5,7 @@ from models.commandes_model import Commandes, CommandesRead, CommandesCreate
 from services import commandes_service
 
 router = APIRouter()
+ERROR_COMMANDE_EXISTANTE = "Commande déjà existante"
 
 @router.get("/", response_model=list[CommandesRead])
 def get_all_commandes(session: Session = Depends(get_session)):
@@ -21,14 +22,14 @@ def get_commande(commande_id: int, session: Session = Depends(get_session)):
 def create_commande(commande: CommandesCreate, session: Session = Depends(get_session)):
     print(f"Création de la commande avec id={commande.id}")
     if commandes_service.get_commande(commande.id, session):
-        print("Commande déjà existante")
-        raise HTTPException(status_code=400, detail="Commande déjà existante")
+        print(ERROR_COMMANDE_EXISTANTE)
+        raise HTTPException(status_code=400, detail=ERROR_COMMANDE_EXISTANTE)
     try:
         commande_obj = Commandes(**commande.model_dump())
         created = commandes_service.create_commande(commande_obj, session)
         if created is None:
             print("Echec création : commande existe peut-être déjà")
-            raise HTTPException(status_code=400, detail="Commande déjà existante")
+            raise HTTPException(status_code=400, detail=ERROR_COMMANDE_EXISTANTE)
         return created
     except Exception as e:
         print(f"Erreur lors de la création : {str(e)}")

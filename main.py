@@ -10,3 +10,11 @@ create_db_and_tables()
 
 # Inclusion des routes
 app.include_router(commandes_router, prefix="/commandes", tags=["Commandes"])
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+from prometheus_fastapi_instrumentator import Instrumentator
+
+instrumentator = Instrumentator().instrument(app).expose(app)
