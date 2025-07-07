@@ -1,0 +1,26 @@
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+    networks:
+      - jenkins-net
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: mspr2
+    ports:
+      - "5432:5432"
+    networks:
+      - jenkins-net
+
+networks:
+  jenkins-net:
+
+volumes:
+  jenkins_data:
