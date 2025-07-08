@@ -32,7 +32,14 @@ pipeline {
                 '''
             }
         }
-
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh''cd docker'
+                    sh 'docker build -t mspr2 .'
+                }
+            }
+        }
 
         stage('Deploy') {
             steps {
