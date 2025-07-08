@@ -2,17 +2,21 @@ version: '3.8'
 
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build: .
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Jenkins Web
     volumes:
       - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - ci-net
     environment:
       - DATABASE_URL=postgresql://postgres:root@postgres:5432/mspr2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:15
@@ -21,7 +25,7 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_DB: mspr2
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Pour accès local (pas nécessaire dans Jenkins)
     networks:
       - ci-net
     healthcheck:

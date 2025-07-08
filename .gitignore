@@ -92,6 +92,6 @@ test.db
 sonar-project.properties
 .scannerwork/.sonar_lock
 .scannerwork/report-task.txt
-JunkinsFile
+Jenkinsfile
 # Ignore test reports (if you want)
 tests/reports/
